@@ -51,42 +51,26 @@ public class DownloadManager {
     };
 
     // Start download procedure
-    File folder = new File(".");
-    File[] listOfFiles = folder.listFiles();
-    boolean fileAlreadyExisting = false;
+    int fileSize = getFileSize(url);
+    parts = generateParts(url, fileName, fileSize);
 
-    for (int i = 0; i < listOfFiles.length; i++) {
-      File file = listOfFiles[i];
-      if (file.isFile() && file.getName().contains(fileName) && file.getName().endsWith("tmp")) {
-        fileAlreadyExisting = true;
-        //String content = FileUtils.readFileToString(file);
-      }
-    }
-    if(fileAlreadyExisting){
-      System.out.println("Resume");
-    } else {
-      System.out.println("New");
-      int fileSize = getFileSize(url);
-      parts = generateParts(url, fileName, fileSize);
-
-      for(int i = 0; i < parts.size(); i++){
-        //if(threadWorkers != maxThreadWorkers){
-        Thread newWorker = new Downloader(parts.get(i));
-        //threadWorkers++;
-        threads.add(newWorker);
-        newWorker.start();
-        //}
-        // User can press CTRL + D
-        /*if(scanner.hasNext()) {
-          // Perform all other stuffs
-          System.exit(0);
-        }*/
-      }
+    for(int i = 0; i < parts.size(); i++){
+      //if(threadWorkers != maxThreadWorkers){
+      Thread newWorker = new Downloader(parts.get(i));
+      //threadWorkers++;
+      threads.add(newWorker);
+      newWorker.start();
+      //}
+      // User can press CTRL + D
+      /*if(scanner.hasNext()) {
+        // Perform all other stuffs
+        System.exit(0);
+      }*/
 
       // All temp files downloaded execute Merger
       for(Thread thread : threads){
         try {
-          thread.join(8000);
+          thread.join(5000);
         } catch (InterruptedException e) {
           System.out.println(e);
           System.exit(0);
